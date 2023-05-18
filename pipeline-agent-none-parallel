@@ -1,0 +1,70 @@
+pipeline {
+    agent none
+    environment {
+      NAME="mohan"
+    }
+      stages {
+        stage('BUILD PARALLEL') {
+          parallel {
+            stage('build 1') {
+              agent { label ' master' }
+          steps {
+            echo "$NAME"
+           sh  '''
+            echo $NAME
+            '''
+          }
+            }
+        stage('build 2') {
+          agent { label 'slave_2' }
+          steps {
+            echo 'hello world'
+            sh  '''
+            echo $NAME
+            '''
+          }
+        }
+          }
+        }
+        stage('TEST PARALLEL') {
+      parallel {
+        stage(' test1') {
+          steps {
+            echo 'this is TEST stage'
+          }
+        }
+        stage(' test2') {
+          steps {
+            echo 'this is TEST stage'
+          }
+        }
+      }
+        }
+    stage ('DEPLOY PARALLEL') {
+      parallel {
+        stage ( 'deploy 1' ){
+      agent { label 'master' }
+      steps {
+        echo 'this is deploy stage'
+      }
+    }
+    stage ( 'deploy 2' ){
+      agent { label 'slave_2'}
+      steps {
+        echo "hi"
+      }
+    }
+    stage ( 'deploy 3' ){
+      agent {label 'slave_1'}
+      steps {
+        echo 'hey'
+        sh  '''
+            echo $NAME
+            '''
+      }
+    }
+      }
+
+        }
+    }
+}
